@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Love Matrix Explosion</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      height: 100%;
+      background: black;
+      font-family: 'Poppins', sans-serif;
+      cursor: pointer;
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+
+    .click-text {
+      position: absolute;
+      color: #ff69b4;
+      font-size: 2rem;
+      font-weight: bold;
+      opacity: 1;
+      animation: fadeMove 1.2s ease-out forwards;
+      pointer-events: none;
+      z-index: 15;
+      text-shadow: 0 0 8px #ff69b4;
+    }
+
+    @keyframes fadeMove {
+      to {
+        transform: translateY(-40px);
+        opacity: 0;
+      }
+    }
+
+    .particle {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background-color: #ff69b4;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 10;
+      animation: explode 0.8s forwards ease-out;
+    }
+
+    @keyframes explode {
+      100% {
+        transform: translate(
+          calc(100px * var(--dx)),
+          calc(100px * var(--dy))
+        );
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+<audio id="bg-audio" loop>
+    <source src="https://156.67.83.133/Common/Images/audio.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+<canvas id="matrix"></canvas>
+
+<script>
+    const audio = document.getElementById("bg-audio");
+
+    document.addEventListener("DOMContentLoaded", function () {
+      playAudio();
+    });
+    function playAudio() {
+      audio.play().catch(error => console.log("Error playing audio:", error));
+    }
+  // MATRIX BACKGROUND
+  const canvas = document.getElementById('matrix');
+  const ctx = canvas.getContext('2d');
+
+  function setCanvasSize() {
+    canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth;
+  }
+  setCanvasSize();
+
+  const letters = '01MYLOVE❤';
+  const fontSize = 14;
+  const columns = Math.floor(canvas.width / fontSize);
+  const drops = Array(columns).fill(1);
+
+  function drawMatrix() {
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = '#ff69b4';
+    ctx.font = `${fontSize}px monospace`;
+
+    for (let i = 0; i < drops.length; i++) {
+      const text = letters[Math.floor(Math.random() * letters.length)];
+      ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+        drops[i] = 0;
+      }
+      drops[i]++;
+    }
+  }
+
+  setInterval(drawMatrix, 33);
+  window.addEventListener('resize', setCanvasSize);
+
+  // CLICK HANDLER
+  document.body.addEventListener('click', (e) => {
+
+    playAudio();
+    // 1. Create My Love text
+    const text = document.createElement('div');
+    text.className = 'click-text';
+    text.innerText = 'My Love';
+    text.style.left = `${e.clientX}px`;
+    text.style.top = `${e.clientY}px`;
+    document.body.appendChild(text);
+    setTimeout(() => text.remove(), 1200);
+
+    // 2. Create exploding particles
+    for (let i = 0; i < 20; i++) {
+      const particle = document.createElement('div');
+      particle.classList.add('particle');
+
+      const dx = Math.random() * 2 - 1;
+      const dy = Math.random() * 2 - 1;
+
+      particle.style.setProperty('--dx', dx);
+      particle.style.setProperty('--dy', dy);
+      particle.style.left = `${e.clientX}px`;
+      particle.style.top = `${e.clientY}px`;
+
+      document.body.appendChild(particle);
+      setTimeout(() => particle.remove(), 800);
+    }
+  });
+</script>
+</body>
+</html>
